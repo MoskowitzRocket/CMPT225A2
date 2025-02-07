@@ -8,7 +8,7 @@ OBJS = TestQuadraticProbing.o QuadraticProbing.o
 
 TARGET = main
 
-HEADERS = dsexceptions.h QuadraticProbing.h
+HEADERS = dsexceptions.h QuadraticProbing.h BiMap.h
 
 all: $(TARGET)
 

@@ -24,14 +24,24 @@ template <typename HashedObj>
 class HashTable
 {
   public:
+
+    //Constructor
+    //Sizes array to next prime greater than size -> default 101
+    //Then sets all entries to 0
+    
     explicit HashTable( int size = 101 ) : array( nextPrime( size ) )
       { makeEmpty( ); }
+
+
+    //calls find pos to find index of x
+    //uses is active to make sure its ACTIVE -> not deleted or empty
 
     bool contains( const HashedObj & x ) const
     {
         return isActive( findPos( x ) );
     }
 
+    //sets current size to 0 and sets all array elements to EMPTY
     void makeEmpty( )
     {
         currentSize = 0;
@@ -39,6 +49,7 @@ class HashTable
             entry.info = EMPTY;
     }
 
+    //
     bool insert( const HashedObj & x )
     {
             // Insert x as active
