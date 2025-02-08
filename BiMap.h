@@ -107,7 +107,7 @@ class BiMap
 
     enum EntryType { ACTIVE, EMPTY, DELETED };
 
-    const & ValType getVal( const KeyType & x ) const 
+    const ValType& getVal( const KeyType & x ) const 
     {
         int pos = findPos( x );
 
