@@ -107,6 +107,14 @@ class BiMap
 
     enum EntryType { ACTIVE, EMPTY, DELETED };
 
+    const & ValType getVal( const KeyType & x ) const 
+    {
+        int pos = findPos( x );
+
+        return array[ pos ].second;
+    }
+    
+
     void ddisplay() const
     {
         cout << "Index\tStatus\tFirst\tSecond" << endl;
