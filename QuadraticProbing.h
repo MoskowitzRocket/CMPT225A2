@@ -9,7 +9,7 @@ using namespace std;
 
 int nextPrime( int n );
 
-// QuadraticProbing Hash table class
+// QuadraticProbing Hash table 
 //
 // CONSTRUCTION: an approximate initial size or default of 101
 //
