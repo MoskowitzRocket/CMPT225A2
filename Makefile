@@ -2,9 +2,9 @@ CXX = g++
 
 CXXFLAGS = -Wall -Wextra -std=c++20
 
-SRC = TestQuadraticProbing.cpp QuadraticProbing.cpp
+SRC = TestBiMap.cpp QuadraticProbing.cpp
 
-OBJS = TestQuadraticProbing.o QuadraticProbing.o
+OBJS = TestBiMap.o QuadraticProbing.o
 
 TARGET = main
 
