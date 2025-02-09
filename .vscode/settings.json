@@ -1,5 +1,12 @@
 {
     "files.associations": {
         "vector": "cpp"
-    }
+    },
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/wsl.localhost/Ubuntu/home/kale/cmpt225/cmpt225a2",
+            "binaryPath": "/wsl.localhost/Ubuntu/home/kale/cmpt225/cmpt225a2/main",
+            "binaryArgs": []
+        }
+    ]
 }
