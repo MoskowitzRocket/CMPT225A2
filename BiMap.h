@@ -45,7 +45,13 @@ class BiMap
     //TODO
     bool containsVal( const ValType & x) const
     {
-
+        // return isActive( findValPos( x ) );
+        for (const auto &entry : valueArray) {
+            if (entry.info == ACTIVE && entry.second == x) {
+                return true;
+            }
+        }
+        return false;
     }
     
 
@@ -54,6 +60,8 @@ class BiMap
     {
         currentSize = 0;
         for( auto & entry : keyArray )
+            entry.info = EMPTY;
+        for( auto & entry : valueArray )
             entry.info = EMPTY;
     }
 
@@ -77,6 +85,10 @@ class BiMap
         keyArray[ currentPos ].info = ACTIVE;
         keyArray[ currentPos ].second = y;
 
+        valueArray[ currentPos ].first = x;
+        valueArray[ currentPos ].info = ACTIVE;
+        valueArray[ currentPos ].second = y;
+
             // Rehash; see Section 5.5
         if( currentSize > keyArray.size( ) / 2 )
             rehash( );
@@ -84,28 +96,32 @@ class BiMap
         return true;
     }
     
-    bool insert( KeyType && x , ValType && y )
-    {
-            // Insert x as active
-        int currentPos = findKeyPos( x );
-        if( isActive( currentPos ) )
-            return false;
+    // bool insert( KeyType && x , ValType && y )
+    // {
+    //         // Insert x as active
+    //     int currentPos = findKeyPos( x );
+    //     if( isActive( currentPos ) )
+    //         return false;
 
-        if( keyArray[ currentPos ].info != DELETED )
-            ++currentSize;
+    //     if( keyArray[ currentPos ].info != DELETED )
+    //         ++currentSize;
 
-        keyArray[ currentPos ].first = std::move( x );
-        keyArray[ currentPos ].info = ACTIVE;
-        keyArray[ currentPos ].second = std::move( y );
+    //     keyArray[ currentPos ].first = std::move( x );
+    //     keyArray[ currentPos ].info = ACTIVE;
+    //     keyArray[ currentPos ].second = std::move( y );
+
+    //     valueArray[ currentPos ].first = std::move( x );
+    //     valueArray[ currentPos ].info = ACTIVE;
+    //     valueArray[ currentPos ].second = std::move( y );
         
 
 
-            // Rehash; see Section 5.5
-        if( currentSize > keyArray.size( ) / 2 )
-            rehash( );
+    //         // Rehash; see Section 5.5
+    //     if( currentSize > keyArray.size( ) / 2 )
+    //         rehash( );
 
-        return true;
-    }
+    //     return true;
+    // }
 
     bool removeKey( const KeyType & x )
     {
@@ -114,12 +130,20 @@ class BiMap
             return false;
 
         keyArray[ currentPos ].info = DELETED;
+        valueArray[currentPos].info = DELETED;
+
         return true;
     }
 
     //TODO
-    bool removeVal (const KeyType & x)
+    bool removeVal (const ValType & x)
     {
+        int currentPos = findValPos( x );
+        if( !isActive(currentPos)) 
+            return false;
+        keyArray[ currentPos ].info = DELETED;
+        valueArray[currentPos].info = DELETED;
+        return true;
 
     }
 
@@ -134,7 +158,9 @@ class BiMap
 
     const KeyType& getKey( const ValType & x) const
     {
+        int pos = findValPos( x );
 
+        return valueArray[ pos ].first;
     }
 
     
@@ -150,6 +176,25 @@ class BiMap
             {
             case ACTIVE:
                 cout << "ACTIVE\t" << keyArray[i].first << "\t" << keyArray[i].second;
+                break;
+            case EMPTY:
+                cout << "EMPTY\t-\t-";
+                break;
+            case DELETED:
+                cout << "DELETED\t-\t-";
+                break;
+            }
+            cout << endl;
+        }
+        cout << "VALUE ARRAY:\n";
+        cout << "Index\tStatus\tFirst\tSecond" << endl;
+        for (size_t i = 0; i < valueArray.size(); ++i)
+        {
+            cout << i << "\t";
+            switch (valueArray[i].info)
+            {
+            case ACTIVE:
+                cout << "ACTIVE\t" << valueArray[i].first << "\t" << valueArray[i].second;
                 break;
             case EMPTY:
                 cout << "EMPTY\t-\t-";
@@ -194,7 +239,7 @@ class BiMap
     int findKeyPos( const KeyType & x ) const
     {
         int offset = 1;
-        int currentPos = myhash( x );
+        int currentPos = myhash( x , keyArray);
 
         while( keyArray[ currentPos ].info != EMPTY &&
                keyArray[ currentPos ].first != x )
@@ -210,11 +255,20 @@ class BiMap
 
     int findValPos(const ValType & x) const
     {
-        int offset = 1;
-        int currentPos = myhash( x );
-
         
+        int offset = 1;
+        int currentPos = myhash( x , valueArray);
 
+        while( valueArray[ currentPos ].info != EMPTY &&
+            valueArray[ currentPos ].second != x )
+        {
+            currentPos += offset;  // Compute ith probe
+            offset += 2;
+            if( currentPos >= valueArray.size( ) )
+                currentPos -= valueArray.size( );
+        }
+
+        return currentPos;
     }
 
     void rehash( )
@@ -227,17 +281,26 @@ class BiMap
         for( auto & entry : keyArray )
             entry.info = EMPTY;
 
+        valueArray.resize( nextPrime( 2 * oldValueArray.size( ) ) );
+        for( auto & entry : valueArray )
+            entry.info = EMPTY;
+
             // Copy table over
         currentSize = 0;
         for( auto & entry : oldKeyArray )
             if( entry.info == ACTIVE )
-                insert( std::move( entry.first), std::move( entry.second) );
-    }
+                insert( std::move( entry.first), std::move( entry.second ) );
 
-    size_t myhash( const KeyType & x ) const
+        for (auto & entry : oldValueArray)
+            if (entry.info == ACTIVE ) 
+                insert( std::move( entry.first), std::move( entry.second ) );
+        
+    }
+    template <typename T>
+    size_t myhash( const T & x, const vector<HashEntry> &arr) const
     {
-        static hash<KeyType> hf;
-        return hf( x ) % keyArray.size( );
+        static hash<T> hf;
+        return hf( x ) % arr.size( );
     }
 };
 

@@ -1,6 +1,6 @@
 CXX = g++
 
-CXXFLAGS = -Wall -Wextra -std=c++20
+CXXFLAGS =  -std=c++20 -Wall -Wextra -g -O0
 
 SRC = TestBiMap.cpp QuadraticProbing.cpp
 

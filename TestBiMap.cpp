@@ -6,47 +6,45 @@ int main(){
 
     BiMap<int,std::string> h1;
 
-    std::cout << "Test"  << std::endl;
+    h1.insert(1,"One");
 
     h1.ddisplay();
 
-    h1.insert(5,"hello");
-    h1.insert(3,"test");
-    h1.insert(67,"sixty-seven");
-    h1.insert(67-11,"sixty-seven/2");
-    h1.insert(45,"third");
-    h1.insert(34,"fourth");
-
-    std::cout << h1.getSize() << std::endl;
-
-    h1.ddisplay();
-
-    std::cout << h1.getVal(5) << std::endl;
-    std::cout << h1.containsKey(4) << std::endl;
+    cout << h1.getSize() << endl;
     
-
-
     h1.makeEmpty();
-    std::cout << h1.getSize() << std::endl;
+    h1.ddisplay();
+    
+    h1.insert(1,"One");
+    h1.insert(2,"Two");
+    h1.insert(3,"Three");
+
     h1.ddisplay();
 
-    system("clear");
+    cout << (h1.containsKey(1) ? "contains one" : "doesn't") << endl;
 
-    BiMap<std::string,int> h2;
+    cout << (h1.containsKey(4) ? "contains one" : "doesn't") << endl;
 
-    h2.insert("One", 1);
-    h2.insert("Two", 2);
-    h2.insert("Three",3);
-    h2.ddisplay();
-    h2.removeKey("Two");
-    h2.ddisplay();
-    h2.insert("Two", 2);
-    h2.ddisplay();
+    cout << (h1.containsVal("One") ? "contains one" : "doesn't") << endl;
+    cout << (h1.containsVal("Two") ? "contains one" : "doesn't") << endl;
+    cout << (h1.containsVal("Three") ? "contains one" : "doesn't") << endl;
 
-    std::cout << h2.getVal("One") << std::endl;
-    
+    h1.removeKey(1);
+    h1.removeVal("Two");
+    h1.insert(11,"Eleven");
+    h1.ddisplay();
+
+    cout << h1.getVal(11) << endl;
+    cout << h1.getKey("Three") << endl;
+
+    h1.insert(69,"Sixty-Nine");
+    h1.ddisplay();
+
+    cout << h1.getVal(69) << endl;
+    cout << h1.getKey("Sixty-Nine") << endl;
+
+
 
     return 0;
-
     
 }
