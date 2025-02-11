@@ -1,50 +1,48 @@
-#include "BiMap.h"
 #include <iostream>
+#include "BiMap.h"
+using namespace std;
 
-
-int main(){
-
+    // Simple main
+int main( )
+{
     BiMap<int,std::string> h1;
-
-    h1.insert(1,"One");
+    BiMap<int,std::string> h2;
 
     h1.ddisplay();
 
+    h1.insert(5,"Five");
+    h1.ddisplay();
+
+    cout << h1.containsKey(5) << endl;
     cout << h1.getSize() << endl;
-    
-    h1.makeEmpty();
-    h1.ddisplay();
-    
-    h1.insert(1,"One");
-    h1.insert(2,"Two");
-    h1.insert(3,"Three");
+    cout << "Val corresponding to key 5: " << h1.getVal(5) << endl;
 
-    h1.ddisplay();
+    cout << "Key corresponding to Five: " << h1.getKey("Five") << endl;
 
-    cout << (h1.containsKey(1) ? "contains one" : "doesn't") << endl;
+    cout << "TEST";
 
-    cout << (h1.containsKey(4) ? "contains one" : "doesn't") << endl;
+    BiMap<int,int> p;
 
-    cout << (h1.containsVal("One") ? "contains one" : "doesn't") << endl;
-    cout << (h1.containsVal("Two") ? "contains one" : "doesn't") << endl;
-    cout << (h1.containsVal("Three") ? "contains one" : "doesn't") << endl;
+    p.insert(5,5);
+    p.ddisplay();
+    cout << "Val corresponding to key 5: " << p.getVal(5) << endl;
+    cout << "Key corresponding to val 5: " << p.getKey(5) << endl;
 
-    h1.removeKey(1);
-    h1.removeVal("Two");
-    h1.insert(11,"Eleven");
-    h1.ddisplay();
+    p.insert(3,3);
+    p.insert(23,23);
+    cout << p.getSize() << endl;
 
-    cout << h1.getVal(11) << endl;
-    cout << h1.getKey("Three") << endl;
+    p.ddisplay();
+    cout <<"Removing 23\n";
+    p.removeKey(23);
+    //can still get val after removing key 
+    cout << p.getVal(23) << endl;
 
-    h1.insert(69,"Sixty-Nine");
-    h1.ddisplay();
+    p.ddisplay();
 
-    cout << h1.getVal(69) << endl;
-    cout << h1.getKey("Sixty-Nine") << endl;
-
-
-
+    cout << "removing value 3\n";
+    p.removeVal(3);
+    p.ddisplay();
+    cout << p.getSize() << endl;
     return 0;
-    
 }
