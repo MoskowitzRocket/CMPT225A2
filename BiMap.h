@@ -147,6 +147,16 @@ public:
 
     enum EntryType { ACTIVE, EMPTY, DELETED };
 
+    void display()
+        {
+            for (const auto &entry : array)
+            {
+                if (entry.info == ACTIVE)
+                    cout << "(" << entry.first << "," << entry.second << ") ";
+            }
+            cout << endl;
+        }
+
     void ddisplay() const
     {
         cout << "KeyArray\n";
