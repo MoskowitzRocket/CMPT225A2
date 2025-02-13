@@ -342,7 +342,7 @@ private:
   /*
       Computes the hash value for the element x using the standard hash function
       setup as a template so that it can take in either a KeyType or a ValType
-
+  //
   */
   template <typename T> size_t myhash(const T &y) const {
     static hash<T> hf;
