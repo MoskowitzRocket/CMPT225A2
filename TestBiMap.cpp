@@ -13,6 +13,7 @@ void testBiMap()
 
     cout << "\nb3 after initial insertions (display):\n";
     b3.display();  // Simple display
+    cout << "\n Size of b3: \t" << b3.getSize() << endl;
     cout << "b3 after initial insertions (ddisplay):\n";
     b3.ddisplay(); // Detailed display
 
@@ -52,6 +53,7 @@ int main( )
 {
 
     testBiMap();
+    
     // BiMap<int,std::string> h1;
     // BiMap<int,std::string> h2;
 

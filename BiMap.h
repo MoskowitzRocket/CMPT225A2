@@ -8,18 +8,38 @@
 #include <string>
 using namespace std;
 
+
+//Function template for nextPrime
+/*
+    Purpose:
+        returns next prime number greater than or equal to input 'n'
+    
+        used when rehashing the table.
+*/
 int nextPrime(int n);
 
-// QuadraticProbing Hash table 
+// -----------------------------------------------------------------------------
+// Class: BiMap
 //
-// CONSTRUCTION: an approximate initial size or default of 101
-//
-// ******************PUBLIC OPERATIONS*********************
-// bool insert( x )       --> Insert x
-// bool removeKey( x )       --> Remove x
-// bool containsKey( x )     --> Return true if x is present
-// void makeEmpty( )      --> Remove all items
-// int hashCode( string str ) --> Global method to hash strings
+// Purpose:
+//   Implements a bijective mapping between keys (KeyType) and values (ValType)
+//   using two hash tables with quadratic probing. One table (keyArray) maps keys
+//   to values, while the other (valArray) maps values back to keys.
+//   This design enforces one-to-one correspondence between keys and values.
+// 
+// Public Operations:
+//   - makeEmpty()   : Clears all entries in the BiMap.
+//   - getSize()     : Returns the number of active key-value pairs.
+//   - insert(x, y)  : Inserts a unique key-value pair into the map.
+//   - containsKey(x): Checks if the key exists in the map.
+//   - containsVal(y): Checks if the value exists in the map.
+//   - removeKey(x)  : Removes a key (and its associated value) from the map.
+//   - removeVal(y)  : Removes a value (and its associated key) from the map.
+//   - getVal(x)     : Returns the value associated with a key.
+//   - getKey(y)     : Returns the key associated with a value.
+//   - display()     : Displays active key-value pairs in a simple format.
+//   - ddisplay()    : Displays detailed internal state of both hash tables.
+
 
 template <typename KeyType, typename ValType>
 class BiMap
@@ -27,30 +47,38 @@ class BiMap
 public:
 
     //Constructor
-    //Sizes array to next prime greater than size -> default 101
+    //Sizes keyArray and valArray to next prime greater than size -> default 101
     //Then sets all entries to 0
 
-    explicit BiMap(int size = 11) : array(nextPrime(size)), valArray(nextPrime(size))
+    explicit BiMap(int size = 11) : keyArray(nextPrime(size)), valArray(nextPrime(size))
     {
         makeEmpty();
     }
 
-    //sets current size to 0 and sets all array firsts to EMPTY
+    //Function: makeEmpty
+    //sets current size to 0 and sets all keyArray elements to EMPTY
     void makeEmpty()
     {
         currentSize = 0;
-        for (auto& entry : array)
+        for (auto& entry : keyArray)
             entry.info = EMPTY;
 
         for (auto& entry : valArray)
             entry.info = EMPTY;
     }
 
+    //Function: getSize
+    //returns number of elements in the biMap
     int getSize() const
     {
         return currentSize;
     }
 
+    //function insert
+    /*
+        Inserts a new key-value pair (x, y) into the BiMap if both the key and value are unique.
+        True if the insertion is successful, false if either the key or value already exists.
+    */
     bool insert(const KeyType& x, const ValType& y)
     {
         // Insert x as active
@@ -59,41 +87,42 @@ public:
 
         //int currentPosVal = findPosVal( y );
 
-        if (isActive(currentPos, array) || isActive(currentPosVal, valArray))
+        if (isActive(currentPos, keyArray) || isActive(currentPosVal, valArray))
         {
             return false;
         }
 
-        if (array[currentPos].info != DELETED && valArray[currentPosVal].info != DELETED) {
+        if (keyArray[currentPos].info != DELETED && valArray[currentPosVal].info != DELETED) {
             ++currentSize;
         }
 
 
-        array[currentPos].first = x;
-        array[currentPos].second = y;
-        array[currentPos].info = ACTIVE;
+        keyArray[currentPos].first = x;
+        keyArray[currentPos].second = y;
+        keyArray[currentPos].info = ACTIVE;
 
         valArray[currentPosVal].first = x;
         valArray[currentPosVal].second = y;
         valArray[currentPosVal].info = ACTIVE;
 
         // Rehash; see Section 5.5
-        if (currentSize > array.size() / 2) {
+        if (currentSize > keyArray.size() / 2) {
             rehash();
         }
 
         return true;
     }
 
-    //calls find pos to find index of x
-    //uses is active to make sure its ACTIVE -> not deleted or empty
-
+    //function: containsKey
+    //checks to see if the BiMap contains the key x
     bool containsKey(const KeyType& x) const
     {
         int pos = findPosKey(x);
-        return isActive(pos, array);
+        return isActive(pos, keyArray);
     }
 
+     //function: containsVal
+    //checks to see if the BiMap contains the val y
     bool containsVal(const ValType& y) const
     {
         //TODO
@@ -101,15 +130,19 @@ public:
         return isActive(pos, valArray);
     }
 
+    // Function: removeVal
+    /*
+        removes the (key, val) pair with key x
+    */
     bool removeKey(const KeyType& x)
     {
         int currentPos = findPosKey(x);
-        if (!isActive(currentPos, array))
+        if (!isActive(currentPos, keyArray))
             return false;
 
         // Remove value associated with the key
-        ValType temp = array[currentPos].second;
-        array[currentPos].info = DELETED;  // Mark the key as DELETED first
+        ValType temp = keyArray[currentPos].second;
+        keyArray[currentPos].info = DELETED;  // Mark the key as DELETED first
 
         // Now, safely remove the value from valArray
         removeVal(temp);
@@ -117,6 +150,10 @@ public:
         return true;
     }
 
+    // Function: removeKey
+    /*
+        removes the (key, val) pair with val y
+    */
     bool removeVal(const ValType& y)
     {
         int currentPos = findPosVal(y);
@@ -127,29 +164,50 @@ public:
         KeyType temp = valArray[currentPos].first;
         valArray[currentPos].info = DELETED;  // Mark the value as DELETED first
 
-        // Now, safely remove the key from array
+        // Now, safely remove the key from keyArray
         removeKey(temp);
         currentSize--;
         return true;
     }
 
+
+    //function: getVal
+    /*
+        returns the corresponding val to key input x
+    */
     const ValType& getVal(const KeyType& x) const
     {
         int pos = findPosKey(x);
-        return array[pos].second;
+        return keyArray[pos].second;
     }
 
+    //function: getKey
+    /*
+        returns the corresponding key to val input y
+    */
     const KeyType& getKey(const ValType& y) const
     {
         int pos = findPosVal(y);
         return valArray[pos].first;
     }
 
+    //Enum: EntryType
+    /*
+        represents status of each slot in hashtable
+        Active -> value held 
+        Empty -> neverused
+        DELETED -> used to have element but it was removed
+
+    */
     enum EntryType { ACTIVE, EMPTY, DELETED };
 
+    //Function: display
+    /*
+        prints out all (key, val) pairs in the map    
+    */
     void display()
         {
-            for (const auto &entry : array)
+            for (const auto &entry : keyArray)
             {
                 if (entry.info == ACTIVE)
                     cout << "(" << entry.first << "," << entry.second << ") ";
@@ -157,17 +215,21 @@ public:
             cout << endl;
         }
 
+    //function: ddisplay()
+    /*
+        shows entire contents of keyArray -> prints out status, key and value or all
+    */
     void ddisplay() const
     {
         cout << "KeyArray\n";
         cout << "Index\tStatus\tFirst\tSecond" << endl;
-        for (size_t i = 0; i < array.size(); ++i)
+        for (size_t i = 0; i < keyArray.size(); ++i)
         {
             cout << i << "\t";
-            switch (array[i].info)
+            switch (keyArray[i].info)
             {
             case ACTIVE:
-                cout << "ACTIVE\t" << array[i].first << "\t" << array[i].second;
+                cout << "ACTIVE\t" << keyArray[i].first << "\t" << keyArray[i].second;
                 break;
             case EMPTY:
                 cout << "EMPTY\t-\t-";
@@ -197,9 +259,19 @@ public:
             }
             cout << endl;
         }
+        cout << "Current Size:\t" << currentSize;
+
     }
 
 private:
+
+    //struct: HashEntry
+    /*
+        represents single element in hash table -> keyArray is filled with hashEntries
+
+        element -> stored element
+        info -> its status, ACTIVE, EMPTY, or DELETED
+    */
     struct HashEntry
     {
         KeyType first;
@@ -215,36 +287,46 @@ private:
         }
     };
 
-    vector<HashEntry> array;
-    vector<HashEntry> valArray;
-    int currentSize;
+    vector<HashEntry> keyArray; //contains keyArray with pairs hashed by key
+    vector<HashEntry> valArray; //contains valArray with pairs hashed by val
+    int currentSize;            //# of pairs in BiMap
 
+    //Function: isActive 
+    /*
+        checks to see if slot at input index is active in input array
+    */
     bool isActive(int currentPos, const vector<HashEntry>& arr) const
     {
         return arr[currentPos].info == ACTIVE;
     }
 
+     //Function: findPosKey
+    /*
+        locates position in keyArray of provided element x
+    */
     int findPosKey(const KeyType& x) const
     {
         int offset = 1;
-        // int currentPos = myhashKey(x);
         int currentPos = myhash(x);
-        while (array[currentPos].info != EMPTY &&
-            array[currentPos].first != x)
+        while (keyArray[currentPos].info != EMPTY &&
+            keyArray[currentPos].first != x)
         {
             currentPos += offset;  // Compute ith probe
             offset += 2;
-            if (currentPos >= array.size())
-                currentPos -= array.size();
+            if (currentPos >= keyArray.size())
+                currentPos -= keyArray.size();
         }
 
         return currentPos;
     }
 
+     //Function: findPosVal
+    /*
+        locates position in valArray of provided element x
+    */
     int findPosVal(const ValType& y) const
     {
         int offset = 1;
-        //int currentPos = myhashVal(y);
         int currentPos = myhash(y);
         while (valArray[currentPos].info != EMPTY &&
             valArray[currentPos].second != y)
@@ -259,18 +341,22 @@ private:
     }
 
 
-
+    //function: rehash
+    /*
+        Resizes the hash table to a larger size (next prime after doubling) and re-inserts
+      all active elements from the old table into the new table.
+    */
     void rehash()
     {
-        vector<HashEntry> oldArray = array;
+        vector<HashEntry> oldArray = keyArray;
         vector<HashEntry> oldValArray = valArray;
 
 
         // Create new double-sized, empty table
-        array.resize(nextPrime(2 * oldArray.size()));
+        keyArray.resize(nextPrime(2 * oldArray.size()));
         valArray.resize(nextPrime(2 * oldValArray.size()));
 
-        for (auto& entry : array)
+        for (auto& entry : keyArray)
             entry.info = EMPTY;
 
         for (auto& entry : valArray)
@@ -287,23 +373,18 @@ private:
                 insert(std::move(entry.first), std::move(entry.second));
     }
 
-    size_t myhashKey(const KeyType& x) const
-    {
-        static hash<KeyType> hf;
-        return hf(x) % array.size();
-    }
+    
+    //function: myHash
+    /*
+        Computes the hash value for the element x using the standard hash function
+        setup as a template so that it can take in either a KeyType or a ValType
 
-    size_t myhashVal(const ValType& y) const
-    {
-        static hash<ValType> hf;
-        return hf(y) % array.size();
-    }
-    //best way need to fix
+    */   
     template <typename T>
     size_t myhash(const T& y) const
     {
         static hash<T> hf;
-        return hf(y) % array.size();
+        return hf(y) % keyArray.size();
     }
 
 };

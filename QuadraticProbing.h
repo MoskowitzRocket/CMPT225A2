@@ -7,6 +7,13 @@
 #include <string>
 using namespace std;
 
+//Function template for nextPrime
+/*
+    Purpose:
+        returns next prime number greater than or equal to input 'n'
+    
+        used when rehashing the table.
+*/
 int nextPrime( int n );
 
 // QuadraticProbing Hash table 
@@ -33,14 +40,18 @@ class HashTable
       { makeEmpty( ); }
 
 
-    //calls find pos to find index of x
-    //uses is active to make sure its ACTIVE -> not deleted or empty
+    //Function: contains
+    /*
+        Purpose: checks to see if hash table contains element x
+        returns true if found, false otherwise
 
+    */
     bool contains( const HashedObj & x ) const
     {
         return isActive( findPos( x ) );
     }
 
+    //Function: makeEmpty
     //sets current size to 0 and sets all array elements to EMPTY
     void makeEmpty( )
     {
@@ -49,7 +60,12 @@ class HashTable
             entry.info = EMPTY;
     }
 
-    //
+    // Function: insert 
+    /*
+        inserts element X into hash table if not already present.
+
+        returns true with succesful insert
+    */
     bool insert( const HashedObj & x )
     {
             // Insert x as active
@@ -69,7 +85,14 @@ class HashTable
 
         return true;
     }
-    
+     // Function: insert 
+    /*
+        alternate implementation
+        inserts element X into hash table if not already present.
+
+        returns true with succesful insert
+    */
+
     bool insert( HashedObj && x )
     {
             // Insert x as active
@@ -90,6 +113,14 @@ class HashTable
         return true;
     }
 
+    //fFunction: remove
+    /*
+        removes element x from the hash table by marking its slot as DELETED
+
+        returns true if succesfully removing.
+    
+    
+    */
     bool remove( const HashedObj & x )
     {
         int currentPos = findPos( x );
@@ -100,9 +131,25 @@ class HashTable
         return true;
     }
 
+
+    //Enum: EntryType
+    /*
+        represents status of each slot in hashtable
+        Active -> value held 
+        Empty -> neverused
+        DELETED -> used to have element but it was removed
+
+    */
     enum EntryType { ACTIVE, EMPTY, DELETED };
 
   private:
+    //struct: HashEntry
+    /*
+        represents single element in hash table -> array is filled with hashEntries
+
+        element -> stored element
+        info -> its status, ACTIVE, EMPTY, or DELETED
+    */
     struct HashEntry
     {
         HashedObj element;
@@ -115,12 +162,22 @@ class HashTable
           : element{ std::move( e ) }, info{ i } { }
     };
     
-    vector<HashEntry> array;
-    int currentSize;
 
+    vector<HashEntry> array; //array for hash table
+    int currentSize;        //number of active elements in table
+
+    //Function: isActive 
+    /*
+        checks to see if slot at input index is active
+
+    */
     bool isActive( int currentPos ) const
       { return array[ currentPos ].info == ACTIVE; }
 
+    //Function: findPos
+    /*
+        locates position in array of provided element x
+    */
     int findPos( const HashedObj & x ) const
     {
         int offset = 1;
@@ -138,6 +195,11 @@ class HashTable
         return currentPos;
     }
 
+    //function: rehash
+    /*
+        Resizes the hash table to a larger size (next prime after doubling) and re-inserts
+      all active elements from the old table into the new table.
+    */
     void rehash( )
     {
         vector<HashEntry> oldArray = array;
@@ -154,6 +216,11 @@ class HashTable
                 insert( std::move( entry.element ) );
     }
 
+
+    //function: myHash
+    /*
+        Computes the hash value for the element x using the standard hash function
+    */
     size_t myhash( const HashedObj & x ) const
     {
         static hash<HashedObj> hf;
